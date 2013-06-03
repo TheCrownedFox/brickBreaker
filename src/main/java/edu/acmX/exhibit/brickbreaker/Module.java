@@ -33,6 +33,8 @@ public class Module extends ProcessingModule {
 	private boolean lost;
 	private int aliveBricks;
 	private int endTime;
+	private VirtualRectClick end;
+	private VirtualRectClick playAgain;
 	
 	public void setup() {
 		generateConstants();
@@ -53,12 +55,19 @@ public class Module extends ProcessingModule {
 		projectile.draw();
 		drawBricks();
 		drawLives();
-		if (lives <= 0) {
+		if (lives < 0) {
 			rect(0, 0, width, height);
 			fill(255, 69, 0);
 			textSize(width / 8);
 			//rectMode(CENTER);
 			text("GAME OVER", width / 10, height / 3);
+			stroke(0);
+			strokeWeight(4);
+			fill(255, 0, 0);
+			rect(end.getX(), end.getY(), end.getWidth(), end.getHeight(), end.getWidth() / 6, end.getHeight() / 6);
+			fill(50, 205, 50);
+			rect(playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight(), playAgain.getWidth() / 6, playAgain.getHeight() / 6);
+			noStroke();
 		}
 
 	}
@@ -73,6 +82,10 @@ public class Module extends ProcessingModule {
 			++lives;
 			projectile = spawnProjectile();
 			bricksList = populateBricks();
+		}
+		if (lives < 0) {
+			end = new VirtualRectClick(1000, 3 * width / 5, 3 * height/ 5, width / 5, height /5);
+			playAgain = new VirtualRectClick(1000, width / 5, 3 * height / 5, width / 5, height / 5);
 		}
 	}
 	

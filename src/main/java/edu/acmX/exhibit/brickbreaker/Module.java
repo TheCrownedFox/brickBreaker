@@ -20,11 +20,16 @@ public class Module extends ProcessingModule {
 	public static float BRICK_HEIGHT;
 	public static float BRICK_VERTICAL_SPACING;
 	public static float BRICK_HORIZONTAL_SPACING;
-	public static Rectangle2D BRICK_BOUNDS; 
+	public static Rectangle2D BRICK_BOUNDS;
+	public static float LIVES_DISP_X;
+	public static float LIVES_DISP_Y;
+	public static float LIVES_SPACING;
+	public static final int START_LIVES = 3;
 	
 	private List<List<Brick>> bricksList;
 	private Paddle paddle;
 	private Projectile projectile;
+	private int lives;
 	
 	public void setup() {
 		generateConstants();
@@ -32,6 +37,7 @@ public class Module extends ProcessingModule {
 		BACKGROUND_COLOR = color(0, 0, 139);
 		paddle = new Paddle(this, PADDLE_START_X, PADDLE_START_Y , PADDLE_WIDTH, PADDLE_HEIGHT);
 		projectile = spawnProjectile();
+		lives = START_LIVES;
 		bricksList = new ArrayList<List<Brick>>(); 
 		populateBricks();
 		noCursor();
@@ -43,6 +49,7 @@ public class Module extends ProcessingModule {
 		paddle.draw();
 		projectile.draw();
 		drawBricks();
+		drawLives();
 	}
 	
 	public void update() {
@@ -81,6 +88,7 @@ public class Module extends ProcessingModule {
 	public void checkForDeadProjectiles() {
 		if (projectile.isDead()) {
 			projectile = spawnProjectile();
+			--lives;
 		}
 	}
 	
@@ -101,6 +109,9 @@ public class Module extends ProcessingModule {
 		BRICK_VERTICAL_SPACING = height / 40;
 		BRICK_HORIZONTAL_SPACING = width / 60;
 		BRICK_BOUNDS = new Rectangle2D.Float(width / 30, height / 30, width - width / 30, height / 3);
+		LIVES_DISP_X = 0;
+		LIVES_DISP_Y = 0;
+		LIVES_SPACING = height / 60;
 	}
 	
 	public void populateBricks() {
@@ -118,6 +129,7 @@ public class Module extends ProcessingModule {
 			y += BRICK_HEIGHT + BRICK_VERTICAL_SPACING;
 		}
 	}
+	
 	public void drawBricks() {
 		for(List<Brick> list : bricksList) {
 			for(Brick brick : list) {
@@ -125,6 +137,13 @@ public class Module extends ProcessingModule {
 					brick.draw();
 				}
 			}
+		}
+	}
+	
+	public void drawLives() {
+		fill(Projectile.COLOR);
+		for(int i = 0; i < lives; i++) {
+			rect(LIVES_DISP_X, LIVES_DISP_Y + (i * (LIVES_SPACING + (projectile.getLength() / 2))), projectile.getLength() / 2, projectile.getLength() / 2);
 		}
 	}
 }

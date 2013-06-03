@@ -16,7 +16,7 @@ public class Projectile {
 	private float velocityY;
 	private Rectangle2D rect;
 	private boolean dead;
-	private static int COLOR;
+	public static int COLOR;
 	
 	public Projectile(PApplet parent, float x, float y, float length) {
 		this.parent = parent;
@@ -75,5 +75,9 @@ public class Projectile {
 	
 	public Rectangle2D getRect() {
 		return rect;
+	}
+	
+	public float getLength() {
+		return width;
 	}
 }

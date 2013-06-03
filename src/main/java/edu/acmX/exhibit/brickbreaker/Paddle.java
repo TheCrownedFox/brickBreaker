@@ -35,7 +35,7 @@ public class Paddle {
 	public void update() {
 		int mousePosX = parent.mouseX;
 		if(parent.mouseX > x + width / 3 && parent.mouseX < x + 2 * width / 3) {
-			return;
+			return ;
 		}
 		if(x + width / 2 > mousePosX) {
 			x -= SPEED;

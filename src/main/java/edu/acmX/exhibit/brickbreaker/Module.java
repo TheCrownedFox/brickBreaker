@@ -15,7 +15,7 @@ public class Module extends ProcessingModule {
 		size(width, height);
 		BACKGROUND_COLOR = color(0, 0, 139);
 		paddle = new Paddle(this, width / 2, height - (height / 20), width / 12, height / 25);
-		projectile = new Projectile(this, width / 30, height / 2, width / 40);
+		projectile = spawnProjectile();
 		noCursor();
 	}
 	
@@ -30,6 +30,7 @@ public class Module extends ProcessingModule {
 		paddle.update();
 		projectile.update();
 		checkCollisions();
+		checkForDeadProjectiles();
 	}
 	
 	public void checkCollisions() {
@@ -42,5 +43,15 @@ public class Module extends ProcessingModule {
 				projectile.reverseYDirection();
 			}
 		}
+	}
+	
+	public void checkForDeadProjectiles() {
+		if (projectile.isDead()) {
+			projectile = spawnProjectile();
+		}
+	}
+	
+	public Projectile spawnProjectile() {
+		return new Projectile(this, width / 30, height / 2, width / 40);
 	}
 }

@@ -15,6 +15,7 @@ public class Projectile {
 	private float velocityX;
 	private float velocityY;
 	private Rectangle2D rect;
+	private boolean dead;
 	private static int COLOR;
 	
 	public Projectile(PApplet parent, int x, int y, int length) {
@@ -26,6 +27,7 @@ public class Projectile {
 		this.velocityX = parent.width / 100;
 		this.velocityY = -parent.height / 100;
 		this.rect = new Rectangle.Float(x, y, width, height);
+		this.dead = false;
 		COLOR = parent.color(240,255,255);
 	}
 	
@@ -49,7 +51,7 @@ public class Projectile {
 		}
 		// check against the bottom edge
 		if (y + height >= parent.height) {
-			velocityY *= -1;
+			dead = true;
 		}
 		
 		// move
@@ -65,6 +67,10 @@ public class Projectile {
 	
 	public void reverseYDirection() {
 		velocityY *= -1;
+	}
+	
+	public boolean isDead() {
+		return dead;
 	}
 	
 	public Rectangle2D getRect() {

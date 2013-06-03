@@ -7,14 +7,22 @@ import edu.mines.acmX.exhibit.module_manager.ProcessingModule;
 public class Module extends ProcessingModule {
 
 	public static int BACKGROUND_COLOR;
+	public static float PADDLE_START_X;
+	public static float PADDLE_START_Y;
+	public static float PADDLE_WIDTH;
+	public static float PADDLE_HEIGHT;
+	public static float PROJECTILE_START_X;
+	public static float PROJECTILE_START_Y;
+	public static float PROJECTILE_LENGTH;
 	
 	private Paddle paddle;
 	private Projectile projectile;
 	
 	public void setup() {
+		generateConstants();
 		size(width, height);
 		BACKGROUND_COLOR = color(0, 0, 139);
-		paddle = new Paddle(this, width / 2, height - (height / 20), width / 12, height / 25);
+		paddle = new Paddle(this, PADDLE_START_X, PADDLE_START_Y , PADDLE_WIDTH, PADDLE_HEIGHT);
 		projectile = spawnProjectile();
 		noCursor();
 	}
@@ -52,6 +60,16 @@ public class Module extends ProcessingModule {
 	}
 	
 	public Projectile spawnProjectile() {
-		return new Projectile(this, width / 30, height / 2, width / 40);
+		return new Projectile(this, PROJECTILE_START_X, PROJECTILE_START_Y, PROJECTILE_LENGTH);
+	}
+	
+	public void generateConstants() {
+		PADDLE_START_X =  width / 2;
+		PADDLE_START_Y = height - (height / 20);
+		PADDLE_WIDTH = width / 12;
+		PADDLE_HEIGHT = height / 25;
+		PROJECTILE_START_X =  width / 30;
+		PROJECTILE_START_Y = height / 2;
+		PROJECTILE_LENGTH = width / 40;
 	}
 }

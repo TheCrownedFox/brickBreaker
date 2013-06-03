@@ -18,14 +18,14 @@ public class Projectile {
 	private boolean dead;
 	private static int COLOR;
 	
-	public Projectile(PApplet parent, int x, int y, int length) {
+	public Projectile(PApplet parent, float x, float y, float length) {
 		this.parent = parent;
 		this.x = x;
 		this.y = y;
 		this.height = length;
 		this.width = length;
 		this.velocityX = parent.width / 100;
-		this.velocityY = -parent.height / 100;
+		this.velocityY = parent.height / 100;
 		this.rect = new Rectangle.Float(x, y, width, height);
 		this.dead = false;
 		COLOR = parent.color(240,255,255);

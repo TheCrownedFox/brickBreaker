@@ -1,5 +1,8 @@
 package edu.acmX.exhibit.brickbreaker;
 
+import java.awt.Rectangle;
+import java.awt.geom.Rectangle2D;
+
 import processing.core.PApplet;
 	
 public class Projectile {
@@ -11,6 +14,7 @@ public class Projectile {
 	private float height;
 	private float velocityX;
 	private float velocityY;
+	private Rectangle2D rect;
 	private static int COLOR;
 	
 	public Projectile(PApplet parent, int x, int y, int length) {
@@ -21,6 +25,7 @@ public class Projectile {
 		this.width = length;
 		this.velocityX = parent.width / 100;
 		this.velocityY = -parent.height / 100;
+		this.rect = new Rectangle.Float(x, y, width, height);
 		COLOR = parent.color(240,255,255);
 	}
 	
@@ -50,5 +55,19 @@ public class Projectile {
 		// move
 		x += velocityX;
 		y += velocityY;
+		// update rect
+		rect.setRect(x, y, width, height);
+	}
+	
+	public void reverseXDirection() {
+		velocityX *= -1;
+	}
+	
+	public void reverseYDirection() {
+		velocityY *= -1;
+	}
+	
+	public Rectangle2D getRect() {
+		return rect;
 	}
 }

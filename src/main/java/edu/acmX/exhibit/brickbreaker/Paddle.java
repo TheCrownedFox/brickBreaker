@@ -1,5 +1,7 @@
 package edu.acmX.exhibit.brickbreaker;
 
+import java.awt.geom.Rectangle2D;
+
 import processing.core.PApplet;
 
 public class Paddle {
@@ -9,6 +11,7 @@ public class Paddle {
 	private float y;
 	private float width;
 	private float height;
+	private Rectangle2D rect;
 	public static int COLOR;
 	public static int SPEED;
 	
@@ -18,6 +21,7 @@ public class Paddle {
 		this.y = y;
 		this.width = width;
 		this.height = height;
+		rect = new Rectangle2D.Float(x, y, width, height);
 		COLOR = parent.color(176, 196, 222);
 		SPEED = parent.width/60;
 	}
@@ -39,5 +43,12 @@ public class Paddle {
 		else if(x + width / 2 < mousePosX) {
 			x += SPEED;
 		}
+		
+		// update rect
+		rect.setRect(x, y, width, height);
+	}
+	
+	public Rectangle2D getRect() {
+		return rect;
 	}
 }

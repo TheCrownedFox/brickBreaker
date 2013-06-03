@@ -1,5 +1,7 @@
 package edu.acmX.exhibit.brickbreaker;
 
+import java.awt.geom.Rectangle2D;
+
 import edu.mines.acmX.exhibit.module_manager.ProcessingModule;
 
 public class Module extends ProcessingModule {
@@ -27,5 +29,18 @@ public class Module extends ProcessingModule {
 	public void update() {
 		paddle.update();
 		projectile.update();
+		checkCollisions();
+	}
+	
+	public void checkCollisions() {
+		Rectangle2D intersect = projectile.getRect().createIntersection(paddle.getRect());
+		if (!intersect.isEmpty()) {
+			if (intersect.getWidth() < intersect.getHeight()) {
+				projectile.reverseXDirection();
+			}
+			else if (intersect.getWidth() > intersect.getHeight()) {
+				projectile.reverseYDirection();
+			}
+		}
 	}
 }

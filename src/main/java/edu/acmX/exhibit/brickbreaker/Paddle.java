@@ -51,4 +51,8 @@ public class Paddle {
 	public Rectangle2D getRect() {
 		return rect;
 	}
+	
+	public void setX(float x) {
+		this.x = x;
+	}
 }

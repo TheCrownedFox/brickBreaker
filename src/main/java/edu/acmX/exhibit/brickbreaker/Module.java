@@ -45,6 +45,8 @@ public class Module extends ProcessingModule {
 		lives = START_LIVES;
 		lost = false;
 		bricksList = populateBricks();
+		end = new VirtualRectClick(1000, 3 * width / 5, 3 * height/ 5, width / 5, height /5);
+		playAgain = new VirtualRectClick(1000, width / 5, 3 * height / 5, width / 5, height / 5);
 		noCursor();
 	}
 	
@@ -84,8 +86,19 @@ public class Module extends ProcessingModule {
 			bricksList = populateBricks();
 		}
 		if (lives < 0) {
-			end = new VirtualRectClick(1000, 3 * width / 5, 3 * height/ 5, width / 5, height /5);
-			playAgain = new VirtualRectClick(1000, width / 5, 3 * height / 5, width / 5, height / 5);
+			cursor();
+			end.update(mouseX, mouseY, millis());
+			playAgain.update(mouseX, mouseY, millis());
+			if(end.durationCompleted(millis())) {
+				exit();
+			}
+			else if(playAgain.durationCompleted(millis())) {
+				noCursor();
+				lives = START_LIVES;
+				bricksList = populateBricks();
+				projectile = spawnProjectile();
+				paddle.setX(PADDLE_START_X);
+			}
 		}
 	}
 	

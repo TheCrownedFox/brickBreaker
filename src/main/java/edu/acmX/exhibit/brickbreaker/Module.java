@@ -62,6 +62,20 @@ public class Module extends ProcessingModule {
 				projectile.reverseYDirection();
 			}
 		}
+		for(List<Brick> list : bricksList) {
+			for(Brick brick : list) {
+				Rectangle2D brickIntersect = projectile.getRect().createIntersection(brick.getRect());
+				if(!brickIntersect.isEmpty() && !brick.isDead()) {
+					if (brickIntersect.getWidth() < brickIntersect.getHeight()) {
+						projectile.reverseXDirection();
+					}
+					else if (brickIntersect.getWidth() > brickIntersect.getHeight()) {
+						projectile.reverseYDirection();
+					}
+					brick.kill();
+				}
+			}
+		}
 	}
 	
 	public void checkForDeadProjectiles() {

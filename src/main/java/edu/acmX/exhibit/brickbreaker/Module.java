@@ -30,6 +30,7 @@ public class Module extends ProcessingModule {
 	private Paddle paddle;
 	private Projectile projectile;
 	private int lives;
+	private boolean lost;
 	
 	public void setup() {
 		generateConstants();
@@ -38,6 +39,7 @@ public class Module extends ProcessingModule {
 		paddle = new Paddle(this, PADDLE_START_X, PADDLE_START_Y , PADDLE_WIDTH, PADDLE_HEIGHT);
 		projectile = spawnProjectile();
 		lives = START_LIVES;
+		lost = false;
 		bricksList = new ArrayList<List<Brick>>(); 
 		populateBricks();
 		noCursor();
@@ -50,6 +52,14 @@ public class Module extends ProcessingModule {
 		projectile.draw();
 		drawBricks();
 		drawLives();
+		if (lost) {
+			drawGameOver();
+			int millis = millis();
+			while (millis() - millis < 4000) {
+				// wait
+			}
+			exit();
+		}
 	}
 	
 	public void update() {
@@ -57,6 +67,9 @@ public class Module extends ProcessingModule {
 		projectile.update();
 		checkCollisions();
 		checkForDeadProjectiles();
+		if (lives < 0) {
+			lost = true;
+		}
 	}
 	
 	public void checkCollisions() {
@@ -145,5 +158,9 @@ public class Module extends ProcessingModule {
 		for(int i = 0; i < lives; i++) {
 			rect(LIVES_DISP_X, LIVES_DISP_Y + (i * (LIVES_SPACING + (projectile.getLength() / 2))), projectile.getLength() / 2, projectile.getLength() / 2);
 		}
+	}
+	
+	public void drawGameOver() {
+		// TODO print game over
 	}
 }

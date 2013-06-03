@@ -7,11 +7,13 @@ public class Module extends ProcessingModule {
 	public static int BACKGROUND_COLOR;
 	
 	private Paddle paddle;
+	private Projectile projectile;
 	
 	public void setup() {
 		size(width, height);
 		BACKGROUND_COLOR = color(0, 0, 139);
 		paddle = new Paddle(this, width / 2, height - (height / 20), width / 12, height / 25);
+		projectile = new Projectile(this, width / 30, height / 2, width / 40);
 		noCursor();
 	}
 	
@@ -19,9 +21,11 @@ public class Module extends ProcessingModule {
 		update();
 		background(BACKGROUND_COLOR);
 		paddle.draw();
+		projectile.draw();
 	}
 	
 	public void update() {
 		paddle.update();
+		projectile.update();
 	}
 }

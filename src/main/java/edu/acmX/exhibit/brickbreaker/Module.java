@@ -31,6 +31,8 @@ public class Module extends ProcessingModule {
 	private Projectile projectile;
 	private int lives;
 	private boolean lost;
+	private int aliveBricks;
+	private int endTime;
 	
 	public void setup() {
 		generateConstants();
@@ -40,8 +42,7 @@ public class Module extends ProcessingModule {
 		projectile = spawnProjectile();
 		lives = START_LIVES;
 		lost = false;
-		bricksList = new ArrayList<List<Brick>>(); 
-		populateBricks();
+		bricksList = populateBricks();
 		noCursor();
 	}
 	
@@ -52,14 +53,14 @@ public class Module extends ProcessingModule {
 		projectile.draw();
 		drawBricks();
 		drawLives();
-		if (lost) {
-			drawGameOver();
-			int millis = millis();
-			while (millis() - millis < 4000) {
-				// wait
-			}
-			exit();
+		if (lives <= 0) {
+			rect(0, 0, width, height);
+			fill(255, 69, 0);
+			textSize(width / 8);
+			//rectMode(CENTER);
+			text("GAME OVER", width / 10, height / 3);
 		}
+
 	}
 	
 	public void update() {
@@ -67,8 +68,11 @@ public class Module extends ProcessingModule {
 		projectile.update();
 		checkCollisions();
 		checkForDeadProjectiles();
-		if (lives < 0) {
-			lost = true;
+
+		if (aliveBricks <= 0) {
+			++lives;
+			projectile = spawnProjectile();
+			bricksList = populateBricks();
 		}
 	}
 	
@@ -93,6 +97,7 @@ public class Module extends ProcessingModule {
 						projectile.reverseYDirection();
 					}
 					brick.kill();
+					--aliveBricks;
 				}
 			}
 		}
@@ -127,7 +132,9 @@ public class Module extends ProcessingModule {
 		LIVES_SPACING = height / 60;
 	}
 	
-	public void populateBricks() {
+	public List<List<Brick>> populateBricks() {
+		aliveBricks = 0;
+		ArrayList<List<Brick>> listOfLists = new ArrayList<List<Brick>>(); 
 		int x = (int) BRICK_BOUNDS.getMinX();
 		int y = (int) BRICK_BOUNDS.getMinY();
 		while(y < BRICK_BOUNDS.getHeight() + BRICK_BOUNDS.getMinY() - BRICK_HEIGHT) {
@@ -138,9 +145,11 @@ public class Module extends ProcessingModule {
 				row.add(new Brick(this, x, y, BRICK_WIDTH, BRICK_HEIGHT, color));
 				x += BRICK_WIDTH + BRICK_HORIZONTAL_SPACING;
 			}
-			bricksList.add(row);
+			aliveBricks += row.size();
+			listOfLists.add(row);
 			y += BRICK_HEIGHT + BRICK_VERTICAL_SPACING;
 		}
+		return listOfLists;
 	}
 	
 	public void drawBricks() {
@@ -161,6 +170,6 @@ public class Module extends ProcessingModule {
 	}
 	
 	public void drawGameOver() {
-		// TODO print game over
+
 	}
 }

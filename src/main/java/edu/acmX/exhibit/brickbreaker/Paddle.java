@@ -6,7 +6,7 @@ import processing.core.PApplet;
 
 public class Paddle {
 
-	private PApplet parent;
+	private Module parent;
 	private float x;
 	private float y;
 	private float width;
@@ -15,7 +15,7 @@ public class Paddle {
 	public static int COLOR;
 	public static int SPEED;
 	
-	public Paddle(PApplet parent, float x, float y, float width, float height) {
+	public Paddle(Module parent, float x, float y, float width, float height) {
 		this.parent = parent;
 		this.x = x;
 		this.y = y;
@@ -33,7 +33,7 @@ public class Paddle {
 	}
 	
 	public void update() {
-		int handPosX = (int) Module.getHandX();
+		int handPosX = (int) parent.getHandX();
 		if(handPosX > x + width / 3 && handPosX < x + 2 * width / 3) {
 			return ;
 		}

@@ -14,6 +14,8 @@ public class Projectile {
 	private float height;
 	private float velocityX;
 	private float velocityY;
+	private float previousVelocityX;
+	private float previousVelocityY;
 	private Rectangle2D rect;
 	private boolean dead;
 	public static int COLOR;
@@ -26,6 +28,8 @@ public class Projectile {
 		this.width = length;
 		this.velocityX = 0;
 		this.velocityY = 0;
+		this.previousVelocityX = parent.width / 100;
+		this.previousVelocityY = parent.height / 100;
 		this.rect = new Rectangle.Float(x, y, width, height);
 		this.dead = false;
 		COLOR = parent.color(240,255,255);
@@ -82,8 +86,15 @@ public class Projectile {
 	}
 	
 	public void startMoving() {
-		this.velocityX = parent.width / 100;
-		this.velocityY = parent.height / 100;
+		velocityX = previousVelocityX;
+		velocityY = previousVelocityY;
+	}
+	
+	public void stopMoving() {
+		previousVelocityX = velocityX;
+		previousVelocityY = velocityY;
+		velocityX = 0;
+		velocityY = 0;
 	}
 	
 	public float getVelocityX() {

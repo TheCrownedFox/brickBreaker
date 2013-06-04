@@ -50,8 +50,8 @@ public class Module extends ProcessingModule {
 	private HandTrackerInterface driver;
 	private MyHandReceiver receiver;
 	
-	private static float handX;
-	private static float handY;
+	private float handX;
+	private float handY;
 	
 	public static final String CURSOR_FILENAME = "hand_cursor.png";
 	private PImage cursor_image;
@@ -82,19 +82,7 @@ public class Module extends ProcessingModule {
 		drawBricks();
 		drawLives();
 		if (lives < 0) {
-			rect(0, 0, width, height);
-			fill(255, 69, 0);
-			textSize(width / 8);
-			//rectMode(CENTER);
-			text("GAME OVER", width / 10, height / 3);
-			stroke(0);
-			strokeWeight(4);
-			fill(255, 0, 0);
-			rect(end.getX(), end.getY(), end.getWidth(), end.getHeight(), end.getWidth() / 6, end.getHeight() / 6);
-			fill(50, 205, 50);
-			rect(playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight(), playAgain.getWidth() / 6, playAgain.getHeight() / 6);
-			noStroke();
-			image(cursor_image, handX, handY);
+			drawGameOver();
 		}
 
 	}
@@ -111,6 +99,9 @@ public class Module extends ProcessingModule {
 			if (projectile.getVelocityX() == 0 && projectile.getVelocityY() == 0) {
 				projectile.startMoving();
 			}
+		}
+		else if (receiver.whichHand() == -1 && projectile.getVelocityX() != 0 && projectile.getVelocityY() != 0) {
+			projectile.stopMoving();
 		}
 		paddle.update();
 		projectile.update();
@@ -180,7 +171,7 @@ public class Module extends ProcessingModule {
 	public void generateConstants() {
 		PADDLE_START_X =  width / 2;
 		PADDLE_START_Y = height - (height / 20);
-		PADDLE_WIDTH = width / 12;
+		PADDLE_WIDTH = width / 8;
 		PADDLE_HEIGHT = height / 25;
 		PROJECTILE_START_X =  width / 30;
 		PROJECTILE_START_Y = height / 2;
@@ -233,6 +224,19 @@ public class Module extends ProcessingModule {
 	}
 	
 	public void drawGameOver() {
+			rect(0, 0, width, height);
+			fill(255, 69, 0);
+			textSize(width / 8);
+			//rectMode(CENTER);
+			text("GAME OVER", width / 10, height / 3);
+			stroke(0);
+			strokeWeight(4);
+			fill(255, 0, 0);
+			rect(end.getX(), end.getY(), end.getWidth(), end.getHeight(), end.getWidth() / 6, end.getHeight() / 6);
+			fill(50, 205, 50);
+			rect(playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight(), playAgain.getWidth() / 6, playAgain.getHeight() / 6);
+			noStroke();
+			image(cursor_image, handX, handY);
 
 	}
 	
@@ -265,11 +269,11 @@ public class Module extends ProcessingModule {
 		eventManager.registerReceiver(EventType.HAND_DESTROYED, receiver);
 	}
 	
-	public static float getHandX() {
+	public float getHandX() {
 		return handX;
 	}
 	
-	public static float getHandY() {
+	public float getHandY() {
 		return handY;
 	}
 }

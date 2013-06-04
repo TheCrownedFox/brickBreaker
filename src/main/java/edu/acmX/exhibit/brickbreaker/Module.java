@@ -34,6 +34,7 @@ public class Module extends ProcessingModule {
 	public static float LIVES_DISP_Y;
 	public static float LIVES_SPACING;
 	public static final int START_LIVES = 3;
+	public static final int BRICK_POINT = 10;
 	
 	private List<List<Brick>> bricksList;
 	private Paddle paddle;
@@ -56,6 +57,8 @@ public class Module extends ProcessingModule {
 	public static final String CURSOR_FILENAME = "hand_cursor.png";
 	private PImage cursor_image;
 	
+	private int points;
+	
 	public void setup() {
 		generateConstants();
 		size(width, height);
@@ -71,6 +74,7 @@ public class Module extends ProcessingModule {
 		noCursor();
 		cursor_image = loadImage(CURSOR_FILENAME, "edu.acmX.exhibit.brickbreaker");
 		cursor_image.resize(32, 32);
+		points = 0;
 		registerTracking();
 	}
 	
@@ -81,6 +85,7 @@ public class Module extends ProcessingModule {
 		projectile.draw();
 		drawBricks();
 		drawLives();
+		drawScore();
 		if (lives < 0) {
 			drawGameOver();
 		}
@@ -97,7 +102,7 @@ public class Module extends ProcessingModule {
 			handY -= 300;
 			// TODO find a better place for this function vvvv
 			if (projectile.getVelocityX() == 0 && projectile.getVelocityY() == 0) {
-				projectile.startMoving();
+				projectile.startMoving(); 
 			}
 		}
 		else if (receiver.whichHand() == -1 && projectile.getVelocityX() != 0 && projectile.getVelocityY() != 0) {
@@ -126,11 +131,14 @@ public class Module extends ProcessingModule {
 				bricksList = populateBricks();
 				projectile = spawnProjectile();
 				paddle.setX(PADDLE_START_X);
+				points = 0;
 			}
 		}
 	}
 	
+	// checks all collisions against the projectile
 	public void checkCollisions() {
+		// check collision with paddle
 		Rectangle2D intersect = projectile.getRect().createIntersection(paddle.getRect());
 		if (!intersect.isEmpty()) {
 			if (intersect.getWidth() < intersect.getHeight()) {
@@ -140,6 +148,7 @@ public class Module extends ProcessingModule {
 				projectile.reverseYDirection();
 			}
 		}
+		// check collisions with all bricks
 		for(List<Brick> list : bricksList) {
 			for(Brick brick : list) {
 				Rectangle2D brickIntersect = projectile.getRect().createIntersection(brick.getRect());
@@ -152,6 +161,7 @@ public class Module extends ProcessingModule {
 					}
 					brick.kill();
 					--aliveBricks;
+					points += BRICK_POINT;
 				}
 			}
 		}
@@ -224,6 +234,7 @@ public class Module extends ProcessingModule {
 	}
 	
 	public void drawGameOver() {
+			fill(projectile.getColor());
 			rect(0, 0, width, height);
 			fill(255, 69, 0);
 			textSize(width / 8);
@@ -238,6 +249,12 @@ public class Module extends ProcessingModule {
 			noStroke();
 			image(cursor_image, handX, handY);
 
+	}
+	
+	public void drawScore() {
+		fill(255, 215, 0);
+		textSize(32);
+		text("" + points, 19 * width / 20, height / 20);
 	}
 	
 	public void registerTracking() {

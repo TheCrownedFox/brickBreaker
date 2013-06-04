@@ -104,4 +104,8 @@ public class Projectile {
 	public float getVelocityY() {
 		return velocityY;
 	}
+	
+	public int getColor() {
+		return COLOR;
+	}
 }

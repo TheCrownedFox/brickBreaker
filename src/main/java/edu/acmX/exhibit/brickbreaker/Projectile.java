@@ -24,8 +24,8 @@ public class Projectile {
 		this.y = y;
 		this.height = length;
 		this.width = length;
-		this.velocityX = parent.width / 100;
-		this.velocityY = parent.height / 100;
+		this.velocityX = 0;
+		this.velocityY = 0;
 		this.rect = new Rectangle.Float(x, y, width, height);
 		this.dead = false;
 		COLOR = parent.color(240,255,255);
@@ -79,5 +79,18 @@ public class Projectile {
 	
 	public float getLength() {
 		return width;
+	}
+	
+	public void startMoving() {
+		this.velocityX = parent.width / 100;
+		this.velocityY = parent.height / 100;
+	}
+	
+	public float getVelocityX() {
+		return velocityX;
+	}
+	
+	public float getVelocityY() {
+		return velocityY;
 	}
 }

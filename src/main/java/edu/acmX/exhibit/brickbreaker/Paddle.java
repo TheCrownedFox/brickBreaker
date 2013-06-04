@@ -34,7 +34,7 @@ public class Paddle {
 	
 	public void update() {
 		int handPosX = (int) Module.getHandX();
-		if(parent.mouseX > x + width / 3 && parent.mouseX < x + 2 * width / 3) {
+		if(handPosX > x + width / 3 && handPosX < x + 2 * width / 3) {
 			return ;
 		}
 		if(x + width / 2 > handPosX) {

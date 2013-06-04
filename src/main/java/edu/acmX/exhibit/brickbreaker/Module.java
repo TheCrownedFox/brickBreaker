@@ -56,6 +56,7 @@ public class Module extends ProcessingModule {
 		size(width, height);
 		BACKGROUND_COLOR = color(0, 0, 139);
 		paddle = new Paddle(this, PADDLE_START_X, PADDLE_START_Y , PADDLE_WIDTH, PADDLE_HEIGHT);
+		handX = PADDLE_START_X;
 		projectile = spawnProjectile();
 		lives = START_LIVES;
 		lost = false;
@@ -98,6 +99,10 @@ public class Module extends ProcessingModule {
 			handY = receiver.getY() * (2 + (height / 480));
 			handX -= 300;
 			handY -= 300;
+			// TODO find a better place for this function vvvv
+			if (projectile.getVelocityX() == 0 && projectile.getVelocityY() == 0) {
+				projectile.startMoving();
+			}
 		}
 		paddle.update();
 		projectile.update();

@@ -4,6 +4,8 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
+import processing.core.PImage;
+
 import edu.mines.acmX.exhibit.input_services.events.EventManager;
 import edu.mines.acmX.exhibit.input_services.events.EventType;
 import edu.mines.acmX.exhibit.input_services.hardware.BadFunctionalityRequestException;
@@ -51,6 +53,9 @@ public class Module extends ProcessingModule {
 	private static float handX;
 	private static float handY;
 	
+	public static final String CURSOR_FILENAME = "hand_cursor.png";
+	private PImage cursor_image;
+	
 	public void setup() {
 		generateConstants();
 		size(width, height);
@@ -64,6 +69,8 @@ public class Module extends ProcessingModule {
 		end = new VirtualRectClick(1000, 3 * width / 5, 3 * height/ 5, width / 5, height /5);
 		playAgain = new VirtualRectClick(1000, width / 5, 3 * height / 5, width / 5, height / 5);
 		noCursor();
+		cursor_image = loadImage(CURSOR_FILENAME, "edu.acmX.exhibit.brickbreaker");
+		cursor_image.resize(32, 32);
 		registerTracking();
 	}
 	
@@ -87,6 +94,7 @@ public class Module extends ProcessingModule {
 			fill(50, 205, 50);
 			rect(playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight(), playAgain.getWidth() / 6, playAgain.getHeight() / 6);
 			noStroke();
+			image(cursor_image, handX, handY);
 		}
 
 	}
@@ -115,7 +123,7 @@ public class Module extends ProcessingModule {
 			bricksList = populateBricks();
 		}
 		if (lives < 0) {
-			cursor();
+			//cursor();
 			end.update((int) handX, (int) handY, millis());
 			playAgain.update((int) handX, (int) handY, millis());
 			if(end.durationCompleted(millis())) {

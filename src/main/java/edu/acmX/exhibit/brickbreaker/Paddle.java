@@ -33,14 +33,14 @@ public class Paddle {
 	}
 	
 	public void update() {
-		int mousePosX = parent.mouseX;
+		int handPosX = (int) Module.getHandX();
 		if(parent.mouseX > x + width / 3 && parent.mouseX < x + 2 * width / 3) {
 			return ;
 		}
-		if(x + width / 2 > mousePosX) {
+		if(x + width / 2 > handPosX) {
 			x -= SPEED;
 		}
-		else if(x + width / 2 < mousePosX) {
+		else if(x + width / 2 < handPosX) {
 			x += SPEED;
 		}
 		

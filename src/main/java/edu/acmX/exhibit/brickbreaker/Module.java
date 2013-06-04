@@ -4,7 +4,14 @@ import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 import java.util.List;
 
-import edu.mines.acmX.exhibit.module_manager.ProcessingModule;
+import edu.mines.acmX.exhibit.input_services.events.EventManager;
+import edu.mines.acmX.exhibit.input_services.events.EventType;
+import edu.mines.acmX.exhibit.input_services.hardware.BadFunctionalityRequestException;
+import edu.mines.acmX.exhibit.input_services.hardware.DeviceConnectionException;
+import edu.mines.acmX.exhibit.input_services.hardware.HardwareManager;
+import edu.mines.acmX.exhibit.input_services.hardware.HardwareManagerManifestException;
+import edu.mines.acmX.exhibit.input_services.hardware.devicedata.HandTrackerInterface;
+import edu.mines.acmX.exhibit.module_management.modules.ProcessingModule;
 
 public class Module extends ProcessingModule {
 
@@ -36,6 +43,14 @@ public class Module extends ProcessingModule {
 	private VirtualRectClick end;
 	private VirtualRectClick playAgain;
 	
+	private static HardwareManager hardwareManager;
+	private static EventManager eventManager;
+	private HandTrackerInterface driver;
+	private MyHandReceiver receiver;
+	
+	private static float handX;
+	private static float handY;
+	
 	public void setup() {
 		generateConstants();
 		size(width, height);
@@ -48,6 +63,7 @@ public class Module extends ProcessingModule {
 		end = new VirtualRectClick(1000, 3 * width / 5, 3 * height/ 5, width / 5, height /5);
 		playAgain = new VirtualRectClick(1000, width / 5, 3 * height / 5, width / 5, height / 5);
 		noCursor();
+		registerTracking();
 	}
 	
 	public void draw() {
@@ -75,6 +91,14 @@ public class Module extends ProcessingModule {
 	}
 	
 	public void update() {
+		// update hands 
+		driver.updateDriver();
+		if (receiver.whichHand() != -1) {			
+			handX = receiver.getX() * (2 + (width / 640));
+			handY = receiver.getY() * (2 + (height / 480));
+			handX -= 300;
+			handY -= 300;
+		}
 		paddle.update();
 		projectile.update();
 		checkCollisions();
@@ -87,8 +111,8 @@ public class Module extends ProcessingModule {
 		}
 		if (lives < 0) {
 			cursor();
-			end.update(mouseX, mouseY, millis());
-			playAgain.update(mouseX, mouseY, millis());
+			end.update((int) handX, (int) handY, millis());
+			playAgain.update((int) handX, (int) handY, millis());
 			if(end.durationCompleted(millis())) {
 				exit();
 			}
@@ -197,5 +221,42 @@ public class Module extends ProcessingModule {
 	
 	public void drawGameOver() {
 
+	}
+	
+	public void registerTracking() {
+		// hardware stuff
+		try {
+			hardwareManager = HardwareManager.getInstance();
+		} catch (HardwareManagerManifestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeviceConnectionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		ArrayList<String> drivers;
+		try {
+			drivers = (ArrayList) hardwareManager.getDevices("handtracking");
+			driver = (HandTrackerInterface) hardwareManager.inflateDriver(
+					drivers.get(0), "handtracking");
+
+		} catch (BadFunctionalityRequestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		eventManager = EventManager.getInstance();
+		receiver = new MyHandReceiver();
+		eventManager.registerReceiver(EventType.HAND_CREATED, receiver);
+		eventManager.registerReceiver(EventType.HAND_UPDATED, receiver);
+		eventManager.registerReceiver(EventType.HAND_DESTROYED, receiver);
+	}
+	
+	public static float getHandX() {
+		return handX;
+	}
+	
+	public static float getHandY() {
+		return handY;
 	}
 }

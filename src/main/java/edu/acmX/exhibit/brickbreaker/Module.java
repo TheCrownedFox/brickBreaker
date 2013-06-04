@@ -146,6 +146,7 @@ public class Module extends ProcessingModule {
 			}
 			else if (intersect.getWidth() > intersect.getHeight()) {
 				projectile.reverseYDirection();
+				projectile.setY(PADDLE_START_Y - PROJECTILE_LENGTH - 1);
 			}
 		}
 		// check collisions with all bricks

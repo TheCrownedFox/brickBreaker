@@ -14,6 +14,7 @@
             version="0.0.1">
 
         <inputs>
+        	<input input-type="handtracking" />
         </inputs>
         <requires-module>
         </requires-module>

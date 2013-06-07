@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import processing.core.PImage;
-
 import edu.mines.acmX.exhibit.input_services.events.EventManager;
 import edu.mines.acmX.exhibit.input_services.events.EventType;
 import edu.mines.acmX.exhibit.input_services.hardware.BadFunctionalityRequestException;
@@ -13,6 +12,7 @@ import edu.mines.acmX.exhibit.input_services.hardware.DeviceConnectionException;
 import edu.mines.acmX.exhibit.input_services.hardware.HardwareManager;
 import edu.mines.acmX.exhibit.input_services.hardware.HardwareManagerManifestException;
 import edu.mines.acmX.exhibit.input_services.hardware.devicedata.HandTrackerInterface;
+import edu.mines.acmX.exhibit.input_services.hardware.drivers.InvalidConfigurationFileException;
 import edu.mines.acmX.exhibit.module_management.modules.ProcessingModule;
 
 public class Module extends ProcessingModule {
@@ -265,9 +265,6 @@ public class Module extends ProcessingModule {
 		} catch (HardwareManagerManifestException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (DeviceConnectionException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
 		ArrayList<String> drivers;
 		try {
@@ -276,6 +273,12 @@ public class Module extends ProcessingModule {
 					drivers.get(0), "handtracking");
 
 		} catch (BadFunctionalityRequestException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InvalidConfigurationFileException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (DeviceConnectionException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

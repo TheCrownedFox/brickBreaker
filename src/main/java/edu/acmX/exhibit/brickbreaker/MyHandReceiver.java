@@ -1,8 +1,8 @@
 package edu.acmX.exhibit.brickbreaker;
 
-import edu.mines.acmX.exhibit.input_services.hardware.HandPosition;
-import edu.mines.acmX.exhibit.input_services.hardware.drivers.openni.HandReceiver;
+import edu.mines.acmX.exhibit.input_services.events.HandReceiver;
 import edu.mines.acmX.exhibit.stdlib.graphics.Coordinate3D;
+import edu.mines.acmX.exhibit.stdlib.graphics.HandPosition;
 
 
 
@@ -17,14 +17,14 @@ public class MyHandReceiver extends HandReceiver {
 	
 	public void handCreated(HandPosition pos) {
 		if (handID == -1) {
-			handID = pos.id;
+			handID = pos.getId();
 		}
-		position = pos.position;
+		position = pos.getPosition();
 	}
 	
 	public void handUpdated(HandPosition pos) {
-		if (pos.id == handID) {
-			position = pos.position;
+		if (pos.getId() == handID) {
+			position = pos.getPosition();
 		}
 	}	
 	

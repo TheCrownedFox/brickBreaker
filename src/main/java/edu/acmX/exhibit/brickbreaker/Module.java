@@ -8,12 +8,13 @@ import processing.core.PImage;
 import edu.mines.acmX.exhibit.input_services.events.EventManager;
 import edu.mines.acmX.exhibit.input_services.events.EventType;
 import edu.mines.acmX.exhibit.input_services.hardware.BadFunctionalityRequestException;
-import edu.mines.acmX.exhibit.input_services.hardware.DeviceConnectionException;
 import edu.mines.acmX.exhibit.input_services.hardware.HardwareManager;
 import edu.mines.acmX.exhibit.input_services.hardware.HardwareManagerManifestException;
+import edu.mines.acmX.exhibit.input_services.hardware.UnknownDriverRequest;
 import edu.mines.acmX.exhibit.input_services.hardware.devicedata.HandTrackerInterface;
 import edu.mines.acmX.exhibit.input_services.hardware.drivers.InvalidConfigurationFileException;
 import edu.mines.acmX.exhibit.module_management.modules.ProcessingModule;
+import edu.mines.acmX.exhibit.stdlib.input_processing.tracking.HandTrackingUtilities;
 
 public class Module extends ProcessingModule {
 
@@ -40,11 +41,10 @@ public class Module extends ProcessingModule {
 	private Paddle paddle;
 	private Projectile projectile;
 	private int lives;
-	private boolean lost;
 	private int aliveBricks;
-	private int endTime;
 	private VirtualRectClick end;
 	private VirtualRectClick playAgain;
+	private boolean gamePaused;
 	
 	private static HardwareManager hardwareManager;
 	private static EventManager eventManager;
@@ -67,7 +67,6 @@ public class Module extends ProcessingModule {
 		handX = PADDLE_START_X;
 		projectile = spawnProjectile();
 		lives = START_LIVES;
-		lost = false;
 		bricksList = populateBricks();
 		end = new VirtualRectClick(1000, 3 * width / 5, 3 * height/ 5, width / 5, height /5);
 		playAgain = new VirtualRectClick(1000, width / 5, 3 * height / 5, width / 5, height / 5);
@@ -76,30 +75,19 @@ public class Module extends ProcessingModule {
 		cursor_image.resize(32, 32);
 		points = 0;
 		registerTracking();
-	}
-	
-	public void draw() {
-		update();
-		background(BACKGROUND_COLOR);
-		paddle.draw();
-		projectile.draw();
-		drawBricks();
-		drawLives();
-		drawScore();
-		if (lives < 0) {
-			drawGameOver();
-		}
-
+		gamePaused = true;
 	}
 	
 	public void update() {
 		// update hands 
 		driver.updateDriver();
-		if (receiver.whichHand() != -1) {			
-			handX = receiver.getX() * (2 + (width / 640));
-			handY = receiver.getY() * (2 + (height / 480));
-			handX -= 300;
-			handY -= 300;
+		if (receiver.whichHand() != -1) {	
+			gamePaused = false;
+			float marginFraction = 6;
+			handX = HandTrackingUtilities.getScaledHandX(receiver.getX(), 
+					driver.getHandTrackingWidth(), width, marginFraction);
+			handY = HandTrackingUtilities.getScaledHandY(receiver.getY(), 
+					driver.getHandTrackingHeight(), height, marginFraction);
 			// TODO find a better place for this function vvvv
 			if (projectile.getVelocityX() == 0 && projectile.getVelocityY() == 0) {
 				projectile.startMoving(); 
@@ -107,6 +95,7 @@ public class Module extends ProcessingModule {
 		}
 		else if (receiver.whichHand() == -1 && projectile.getVelocityX() != 0 && projectile.getVelocityY() != 0) {
 			projectile.stopMoving();
+			gamePaused = true;
 		}
 		paddle.update();
 		projectile.update();
@@ -118,8 +107,8 @@ public class Module extends ProcessingModule {
 			projectile = spawnProjectile();
 			bricksList = populateBricks();
 		}
+		
 		if (lives < 0) {
-			//cursor();
 			end.update((int) handX, (int) handY, millis());
 			playAgain.update((int) handX, (int) handY, millis());
 			if(end.durationCompleted(millis())) {
@@ -134,6 +123,27 @@ public class Module extends ProcessingModule {
 				points = 0;
 			}
 		}
+	}
+	
+	public void draw() {
+		update();
+		background(BACKGROUND_COLOR);
+		if (gamePaused) {
+			textAlign(CENTER, CENTER);
+			textSize(96);
+			fill(255, 255, 255);
+			text("Wave to Continue", width / 2, height / 2);
+			textAlign(LEFT, TOP);
+		}
+		paddle.draw();
+		projectile.draw();
+		drawBricks();
+		drawLives();
+		drawScore();
+		if (lives < 0) {
+			drawGameOver();
+		}
+
 	}
 	
 	// checks all collisions against the projectile
@@ -240,7 +250,9 @@ public class Module extends ProcessingModule {
 			fill(255, 69, 0);
 			textSize(width / 8);
 			//rectMode(CENTER);
-			text("GAME OVER", width / 10, height / 3);
+			textAlign(CENTER, CENTER);
+			text("GAME OVER", width / 2, height / 3);
+			textAlign(LEFT, TOP);
 			stroke(0);
 			strokeWeight(4);
 			fill(255, 0, 0);
@@ -266,11 +278,8 @@ public class Module extends ProcessingModule {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		ArrayList<String> drivers;
 		try {
-			drivers = (ArrayList) hardwareManager.getDevices("handtracking");
-			driver = (HandTrackerInterface) hardwareManager.inflateDriver(
-					drivers.get(0), "handtracking");
+			driver = (HandTrackerInterface) hardwareManager.getInitialDriver("handtracking");
 
 		} catch (BadFunctionalityRequestException e) {
 			// TODO Auto-generated catch block
@@ -278,7 +287,7 @@ public class Module extends ProcessingModule {
 		} catch (InvalidConfigurationFileException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (DeviceConnectionException e) {
+		} catch (UnknownDriverRequest e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}

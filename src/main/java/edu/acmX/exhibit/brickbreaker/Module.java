@@ -83,7 +83,7 @@ public class Module extends ProcessingModule {
 		driver.updateDriver();
 		if (receiver.whichHand() != -1) {	
 			gamePaused = false;
-			float marginFraction = 6;
+			float marginFraction = (float) 1/6;
 			handX = HandTrackingUtilities.getScaledHandX(receiver.getX(), 
 					driver.getHandTrackingWidth(), width, marginFraction);
 			handY = HandTrackingUtilities.getScaledHandY(receiver.getY(), 

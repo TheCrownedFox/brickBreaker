@@ -1,27 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest 
-        package="edu.acmX.exhibit.brickbreaker"
-        class="Module" >
+    package="edu.acmX.exhibit.brickbreaker"
+    class="Module" 
+    icon="icon.png" 
+    title="Brick Breaker"
+    author="Exhibit Team"
+    version="0.0.1">
 
-    <uses-sdk 
-            minSdkVersion="0.0.2"
-            targetSdkVersion="0.0.2"/>
+  <uses-sdk 
+      minSdkVersion="0.0.2"
+      targetSdkVersion="0.0.2"/>
 
-    <module 
-            icon="icon.png" 
-            title="Brick Breaker"
-            author="Exhibit Team"
-            version="0.0.1">
-
-        <inputs>
-        	<input input-type="handtracking" />
-        </inputs>
-        <requires-module>
-        </requires-module>
-
-    </module>
+  <inputs>
+    <input input-type="handtracking" />
+  </inputs>
+  <requires-module>
+  </requires-module>
 
 </manifest>
 <!-- vim:fenc=utf-8
-  -->
+-->
 

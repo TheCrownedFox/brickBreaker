@@ -71,7 +71,7 @@ public class Module extends ProcessingModule {
 		end = new VirtualRectClick(1000, 3 * width / 5, 3 * height/ 5, width / 5, height /5);
 		playAgain = new VirtualRectClick(1000, width / 5, 3 * height / 5, width / 5, height / 5);
 		noCursor();
-		cursor_image = loadImage(CURSOR_FILENAME, "edu.acmX.exhibit.brickbreaker", 0);
+		cursor_image = loadImage(CURSOR_FILENAME);
 		cursor_image.resize(32, 32);
 		points = 0;
 		registerTracking();

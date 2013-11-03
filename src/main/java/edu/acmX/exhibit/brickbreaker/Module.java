@@ -51,6 +51,9 @@ public class Module extends ProcessingModule {
 	private HandTrackerInterface driver;
 	private MyHandReceiver receiver;
 	
+	private static final String GAME_RESTART_TEXT = "Replay";
+	private static final String GAME_END_TEXT = "Exit";
+	
 	private float handX;
 	private float handY;
 	
@@ -257,8 +260,22 @@ public class Module extends ProcessingModule {
 			strokeWeight(4);
 			fill(255, 0, 0);
 			rect(end.getX(), end.getY(), end.getWidth(), end.getHeight(), end.getWidth() / 6, end.getHeight() / 6);
+			
+			//draw text for end game box
+			textAlign(CENTER, CENTER);
+			textSize(end.getWidth()/10);
+			fill(0,0,0);
+			text(GAME_END_TEXT, end.getX(), end.getY(), end.getWidth(), end.getHeight());
+
 			fill(50, 205, 50);
 			rect(playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight(), playAgain.getWidth() / 6, playAgain.getHeight() / 6);
+			
+			//draw text for new game box
+			textAlign(CENTER, CENTER);
+			textSize(playAgain.getWidth()/10);
+			fill(0,0,0);
+			text(GAME_RESTART_TEXT, playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight());
+			
 			noStroke();
 			image(cursor_image, handX, handY);
 

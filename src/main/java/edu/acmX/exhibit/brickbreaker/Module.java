@@ -81,7 +81,7 @@ public class Module extends ProcessingModule {
 	public void update() {
 		// update hands 
 		driver.updateDriver();
-		if (receiver.whichHand() != -1) {	
+		if (receiver.whichHand() != MyHandReceiver.NO_HAND) {	
 			gamePaused = false;
 			float marginFraction = (float) 1/6;
 			handX = HandTrackingUtilities.getScaledHandX(receiver.getX(), 
@@ -93,7 +93,7 @@ public class Module extends ProcessingModule {
 				projectile.startMoving(); 
 			}
 		}
-		else if (receiver.whichHand() == -1 && projectile.getVelocityX() != 0 && projectile.getVelocityY() != 0) {
+		else if (receiver.whichHand() == MyHandReceiver.NO_HAND && projectile.getVelocityX() != 0 && projectile.getVelocityY() != 0) {
 			projectile.stopMoving();
 			gamePaused = true;
 		}
@@ -111,7 +111,7 @@ public class Module extends ProcessingModule {
 		if (lives < 0) {
 			end.update((int) handX, (int) handY, millis());
 			playAgain.update((int) handX, (int) handY, millis());
-			if(end.durationCompleted(millis())) {
+			if(end.durationCompleted(millis()) || receiver.whichHand() == MyHandReceiver.NO_HAND) {
 				exit();
 			}
 			else if(playAgain.durationCompleted(millis())) {

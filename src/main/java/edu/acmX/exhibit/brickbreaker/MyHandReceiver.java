@@ -7,16 +7,18 @@ import edu.mines.acmX.exhibit.stdlib.input_processing.receivers.HandReceiver;
 
 
 public class MyHandReceiver extends HandReceiver {
+	
+	public static int NO_HAND = -1;
 
 	private Coordinate3D position;
-	int handID = -1;
+	int handID = NO_HAND;
 	
 	public MyHandReceiver() {
 		position = new Coordinate3D(0, 0, 0);
 	}
 	
 	public void handCreated(HandPosition pos) {
-		if (handID == -1) {
+		if (handID == NO_HAND) {
 			handID = pos.getId();
 		}
 		position = pos.getPosition();
@@ -30,7 +32,7 @@ public class MyHandReceiver extends HandReceiver {
 	
 	public void handDestroyed(int id) {
 		if (id == handID) {
-			handID = -1;
+			handID = NO_HAND;
 		}
 	}
 	

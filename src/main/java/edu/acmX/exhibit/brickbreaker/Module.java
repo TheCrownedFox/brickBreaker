@@ -1,16 +1,14 @@
 package edu.acmX.exhibit.brickbreaker;
 
 import java.awt.geom.Rectangle2D;
+import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.List;
 
+import edu.mines.acmX.exhibit.input_services.hardware.*;
 import processing.core.PImage;
 import edu.mines.acmX.exhibit.input_services.events.EventManager;
 import edu.mines.acmX.exhibit.input_services.events.EventType;
-import edu.mines.acmX.exhibit.input_services.hardware.BadFunctionalityRequestException;
-import edu.mines.acmX.exhibit.input_services.hardware.HardwareManager;
-import edu.mines.acmX.exhibit.input_services.hardware.HardwareManagerManifestException;
-import edu.mines.acmX.exhibit.input_services.hardware.UnknownDriverRequest;
 import edu.mines.acmX.exhibit.input_services.hardware.devicedata.HandTrackerInterface;
 import edu.mines.acmX.exhibit.input_services.hardware.drivers.InvalidConfigurationFileException;
 import edu.mines.acmX.exhibit.module_management.modules.ProcessingModule;
@@ -46,7 +44,6 @@ public class Module extends ProcessingModule {
 	private VirtualRectClick playAgain;
 	private boolean gamePaused;
 	
-	private static HardwareManager hardwareManager;
 	private static EventManager eventManager;
 	private HandTrackerInterface driver;
 	private MyHandReceiver receiver;
@@ -256,9 +253,9 @@ public class Module extends ProcessingModule {
 			stroke(0);
 			strokeWeight(4);
 			fill(255, 0, 0);
-			rect(end.getX(), end.getY(), end.getWidth(), end.getHeight(), end.getWidth() / 6, end.getHeight() / 6);
+			rect(end.getX(), end.getY(), end.getWidth(), end.getHeight(), end.getWidth() / 6);
 			fill(50, 205, 50);
-			rect(playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight(), playAgain.getWidth() / 6, playAgain.getHeight() / 6);
+			rect(playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight(), playAgain.getWidth() / 6);
 			noStroke();
 			image(cursor_image, handX, handY);
 
@@ -271,15 +268,8 @@ public class Module extends ProcessingModule {
 	}
 	
 	public void registerTracking() {
-		// hardware stuff
 		try {
-			hardwareManager = HardwareManager.getInstance();
-		} catch (HardwareManagerManifestException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		try {
-			driver = (HandTrackerInterface) hardwareManager.getInitialDriver("handtracking");
+			driver = (HandTrackerInterface) getInitialDriver("handtracking");
 
 		} catch (BadFunctionalityRequestException e) {
 			// TODO Auto-generated catch block
@@ -289,6 +279,10 @@ public class Module extends ProcessingModule {
 			e.printStackTrace();
 		} catch (UnknownDriverRequest e) {
 			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch ( RemoteException e ) {
+			e.printStackTrace();
+		} catch ( BadDeviceFunctionalityRequestException e ) {
 			e.printStackTrace();
 		}
 

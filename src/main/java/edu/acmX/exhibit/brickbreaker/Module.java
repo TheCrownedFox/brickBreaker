@@ -79,7 +79,7 @@ public class Module extends ProcessingModule {
 	}
 	
 	public void update() {
-		// update hands 
+       	// update hands
 		driver.updateDriver();
 		if (receiver.whichHand() != -1) {	
 			gamePaused = false;
@@ -112,7 +112,8 @@ public class Module extends ProcessingModule {
 			end.update((int) handX, (int) handY, millis());
 			playAgain.update((int) handX, (int) handY, millis());
 			if(end.durationCompleted(millis())) {
-				exit();
+                //TODO Figure out better way to exit
+				destroy();
 			}
 			else if(playAgain.durationCompleted(millis())) {
 				noCursor();
@@ -237,7 +238,7 @@ public class Module extends ProcessingModule {
 		}
 	}
 	
-	public void drawLives() {
+	public void drawLives() { //TODO make this clearer on screen
 		fill(Projectile.COLOR);
 		for(int i = 0; i < lives; i++) {
 			rect(LIVES_DISP_X, LIVES_DISP_Y + (i * (LIVES_SPACING + (projectile.getLength() / 2))), projectile.getLength() / 2, projectile.getLength() / 2);
@@ -288,7 +289,6 @@ public class Module extends ProcessingModule {
 	public void registerTracking() {
 		try {
 			driver = (HandTrackerInterface) getInitialDriver("handtracking");
-
 		} catch (BadFunctionalityRequestException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

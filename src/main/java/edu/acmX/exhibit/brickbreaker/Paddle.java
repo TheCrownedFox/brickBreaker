@@ -30,6 +30,7 @@ public class Paddle {
 	public void draw() {
 		parent.fill(COLOR);
 		parent.rect(x, y, width, height);
+        parent.rect(parent.getHandX(), y, 10, 10);
 	}
 	
 	public void update() {

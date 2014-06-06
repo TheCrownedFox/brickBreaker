@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.mines.acmX.exhibit.input_services.hardware.*;
+import edu.mines.acmX.exhibit.stdlib.scoring.ScoreSaver;
 import processing.core.PImage;
 import edu.mines.acmX.exhibit.input_services.events.EventManager;
 import edu.mines.acmX.exhibit.input_services.events.EventType;
@@ -42,7 +43,11 @@ public class Module extends ProcessingModule {
 	private int aliveBricks;
 	private VirtualRectClick end;
 	private VirtualRectClick playAgain;
+    private VirtualRectClick submitScore;
 	private boolean gamePaused;
+	private ScoreSaver saver;
+	private int highScore = -1;
+    private boolean gameOver;
 	
 	private static EventManager eventManager;
 	private HandTrackerInterface driver;
@@ -50,6 +55,7 @@ public class Module extends ProcessingModule {
 	
 	private static final String GAME_RESTART_TEXT = "Replay";
 	private static final String GAME_END_TEXT = "Exit";
+    private static final String GAME_SUBMIT_TEXT = "Submit";
 	
 	private float handX;
 	private float handY;
@@ -68,18 +74,24 @@ public class Module extends ProcessingModule {
 		projectile = spawnProjectile();
 		lives = START_LIVES;
 		bricksList = populateBricks();
-		end = new VirtualRectClick(1000, 3 * width / 5, 3 * height/ 5, width / 5, height /5);
-		playAgain = new VirtualRectClick(1000, width / 5, 3 * height / 5, width / 5, height / 5);
+		end = new VirtualRectClick(1000, width / 10, 3 * height/ 5, width / 5, height /5);
+		playAgain = new VirtualRectClick(1000, 2 * width / 5, 3 * height / 5, width / 5, height / 5);
+        submitScore = new VirtualRectClick(1000, 7 * width / 10, 3 * height / 5, width / 5, height / 5);
 		noCursor();
 		cursor_image = loadImage(CURSOR_FILENAME);
 		cursor_image.resize(32, 32);
 		points = 0;
+		System.out.println("getting saver");
+		saver = new ScoreSaver("BrickBreaker");
+		highScore = saver.getBestScore(ScoreSaver.ScorePattern.HIGH_BEST);
+		System.out.println("got saver");
 		registerTracking();
+        gameOver = false;
 		gamePaused = true;
 	}
 	
 	public void update() {
-       	// update hands
+		// update hands
 		driver.updateDriver();
 		if (receiver.whichHand() != -1) {	
 			gamePaused = false;
@@ -97,37 +109,45 @@ public class Module extends ProcessingModule {
 			projectile.stopMoving();
 			gamePaused = true;
 		}
-		paddle.update();
-		projectile.update();
-		checkCollisions();
-		checkForDeadProjectiles();
+        if(!gameOver) {
+            paddle.update();
+            projectile.update();
+            checkCollisions();
+            checkForDeadProjectiles();
 
-		if (aliveBricks <= 0) {
-			++lives;
-			projectile = spawnProjectile();
-			bricksList = populateBricks();
-		}
-		
-		if (lives < 0) {
+            if (aliveBricks <= 0) {
+                ++lives;
+                projectile = spawnProjectile();
+                bricksList = populateBricks();
+            }
+        } else {
 			end.update((int) handX, (int) handY, millis());
 			playAgain.update((int) handX, (int) handY, millis());
+            submitScore.update((int) handX, (int) handY, millis());
 			if(end.durationCompleted(millis())) {
-                //TODO Figure out better way to exit
 				destroy();
-			}
-			else if(playAgain.durationCompleted(millis())) {
+			} else if(playAgain.durationCompleted(millis())) {
 				noCursor();
 				lives = START_LIVES;
 				bricksList = populateBricks();
 				projectile = spawnProjectile();
 				paddle.setX(PADDLE_START_X);
 				points = 0;
-			}
+                gameOver = false;
+			} else if(submitScore.durationCompleted(millis())) {
+                saver.addNewScore(points);
+                highScore = max(highScore, points);
+            }
 		}
 	}
 	
 	public void draw() {
 		update();
+        if (lives < 0) {
+            gameOver = true;
+            drawGameOver();
+            return;
+        }
 		background(BACKGROUND_COLOR);
 		if (gamePaused) {
 			textAlign(CENTER, CENTER);
@@ -141,10 +161,6 @@ public class Module extends ProcessingModule {
 		drawBricks();
 		drawLives();
 		drawScore();
-		if (lives < 0) {
-			drawGameOver();
-		}
-
 	}
 	
 	// checks all collisions against the projectile
@@ -246,37 +262,50 @@ public class Module extends ProcessingModule {
 	}
 	
 	public void drawGameOver() {
-			fill(projectile.getColor());
-			rect(0, 0, width, height);
-			fill(255, 69, 0);
-			textSize(width / 8);
-			//rectMode(CENTER);
-			textAlign(CENTER, CENTER);
-			text("GAME OVER", width / 2, height / 3);
-			textAlign(LEFT, TOP);
-			stroke(0);
-			strokeWeight(4);
-			fill(255, 0, 0);
+		fill(projectile.getColor());
+		rect(0, 0, width, height);
+		fill(255, 69, 0);
+		textSize(min(width / 8, height / 6));
+		//rectMode(CENTER);
+		textAlign(CENTER, CENTER);
+		text("GAME OVER", width / 2, height / 6);
+		textSize(min(width / 12, height / 9));
+		text("YOUR SCORE: " + points, width / 2, height / 3);
+		//textAlign(LEFT, TOP);
+		text("HIGH SCORE: " + (highScore != -1 ? highScore : "N/A"), width / 2, height / 2);
 
-			rect(end.getX(), end.getY(), end.getWidth(), end.getHeight(), end.getWidth() / 6);
-			
-			//draw text for end game box
-			textAlign(CENTER, CENTER);
-			textSize(end.getWidth()/10);
-			fill(0,0,0);
-			text(GAME_END_TEXT, end.getX(), end.getY(), end.getWidth(), end.getHeight());
+		stroke(0);
+		strokeWeight(4);
 
-			fill(50, 205, 50);
-			rect(playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight(), playAgain.getWidth() / 6);
-			
-			//draw text for new game box
-			textAlign(CENTER, CENTER);
-			textSize(playAgain.getWidth()/10);
-			fill(0,0,0);
-			text(GAME_RESTART_TEXT, playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight());
-			
-			noStroke();
-			image(cursor_image, handX, handY);
+		fill(255, 0, 0);
+		rect(end.getX(), end.getY(), end.getWidth(), end.getHeight(), end.getWidth() / 6);
+
+		//draw text for end game box
+		textAlign(CENTER, CENTER);
+		textSize(end.getWidth()/10);
+		fill(0,0,0);
+		text(GAME_END_TEXT, end.getX(), end.getY(), end.getWidth(), end.getHeight());
+
+		fill(50, 205, 50);
+		rect(playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight(), playAgain.getWidth() / 6);
+
+		//draw text for new game box
+	    textAlign(CENTER, CENTER);
+		textSize(playAgain.getWidth()/10);
+		fill(0,0,0);
+		text(GAME_RESTART_TEXT, playAgain.getX(), playAgain.getY(), playAgain.getWidth(), playAgain.getHeight());
+
+        fill(0, 0, 255);
+        rect(submitScore.getX(), submitScore.getY(), submitScore.getWidth(), submitScore.getHeight(), submitScore.getWidth() / 6);
+
+        //draw text for submit score box
+        textAlign(CENTER, CENTER);
+        textSize(submitScore.getWidth()/10);
+        fill(0,0,0);
+        text(GAME_SUBMIT_TEXT, submitScore.getX(), submitScore.getY(), submitScore.getWidth(), submitScore.getHeight());
+
+		noStroke();
+		image(cursor_image, handX, handY);
 
 	}
 	

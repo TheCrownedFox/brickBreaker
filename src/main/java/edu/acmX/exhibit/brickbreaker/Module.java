@@ -1,5 +1,7 @@
 package edu.acmX.exhibit.brickbreaker;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.geom.Rectangle2D;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -46,7 +48,6 @@ public class Module extends ProcessingModule {
     private VirtualRectClick submitScore;
 	private boolean gamePaused;
 	private ScoreSaver saver;
-	private int highScore = -1;
     private boolean gameOver;
 	
 	private static EventManager eventManager;
@@ -74,17 +75,14 @@ public class Module extends ProcessingModule {
 		projectile = spawnProjectile();
 		lives = START_LIVES;
 		bricksList = populateBricks();
-		end = new VirtualRectClick(1000, width / 10, 3 * height/ 5, width / 5, height /5);
-		playAgain = new VirtualRectClick(1000, 2 * width / 5, 3 * height / 5, width / 5, height / 5);
-        submitScore = new VirtualRectClick(1000, 7 * width / 10, 3 * height / 5, width / 5, height / 5);
+		end = new VirtualRectClick(1000, width / 10, 5 * height/ 7, width / 5, height /5);
+		playAgain = new VirtualRectClick(1000, 2 * width / 5, 5 * height / 7, width / 5, height / 5);
+        submitScore = new VirtualRectClick(1000, 7 * width / 10, 5 * height / 7, width / 5, height / 5);
 		noCursor();
 		cursor_image = loadImage(CURSOR_FILENAME);
 		cursor_image.resize(32, 32);
 		points = 0;
-		System.out.println("getting saver");
 		saver = new ScoreSaver("BrickBreaker");
-		highScore = saver.getBestScore(ScoreSaver.ScorePattern.HIGH_BEST);
-		System.out.println("got saver");
 		registerTracking();
         gameOver = false;
 		gamePaused = true;
@@ -126,6 +124,7 @@ public class Module extends ProcessingModule {
             submitScore.update((int) handX, (int) handY, millis());
 			if(end.durationCompleted(millis())) {
 				destroy();
+				driver.clearAllHands();
 			} else if(playAgain.durationCompleted(millis())) {
 				noCursor();
 				lives = START_LIVES;
@@ -135,8 +134,16 @@ public class Module extends ProcessingModule {
 				points = 0;
                 gameOver = false;
 			} else if(submitScore.durationCompleted(millis())) {
-                saver.addNewScore(points);
-                highScore = max(highScore, points);
+                //saver.addNewScore(points);
+				receiver.hold();
+				handX = handY = 0;
+				saver.showPanel(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						receiver.release();
+					}
+				}, points, receiver.whichHand(), driver);
+				receiver.setHand(-1);
             }
 		}
 	}
@@ -272,7 +279,9 @@ public class Module extends ProcessingModule {
 		textSize(min(width / 12, height / 9));
 		text("YOUR SCORE: " + points, width / 2, height / 3);
 		//textAlign(LEFT, TOP);
-		text("HIGH SCORE: " + (highScore != -1 ? highScore : "N/A"), width / 2, height / 2);
+		textSize(min(width / 16, height / 12));
+		text("HIGH SCORE:", width / 2, height / 2);
+		text(saver.getBestScoreString(ScoreSaver.ScorePattern.HIGH_BEST), width / 2, 3 * height / 5);
 
 		stroke(0);
 		strokeWeight(4);
@@ -333,11 +342,10 @@ public class Module extends ProcessingModule {
 			e.printStackTrace();
 		}
 
-		eventManager = EventManager.getInstance();
 		receiver = new MyHandReceiver();
-		eventManager.registerReceiver(EventType.HAND_CREATED, receiver);
-		eventManager.registerReceiver(EventType.HAND_UPDATED, receiver);
-		eventManager.registerReceiver(EventType.HAND_DESTROYED, receiver);
+		driver.registerHandCreated(receiver);
+		driver.registerHandUpdated(receiver);
+		driver.registerHandDestroyed(receiver);
 	}
 	
 	public float getHandX() {

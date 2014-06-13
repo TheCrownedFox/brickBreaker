@@ -46,9 +46,12 @@ public class Module extends ProcessingModule {
 	private VirtualRectClick end;
 	private VirtualRectClick playAgain;
     private VirtualRectClick submitScore;
+	private VirtualRectClick end_s;
+	private VirtualRectClick playAgain_s;
 	private boolean gamePaused;
 	private ScoreSaver saver;
     private boolean gameOver;
+	private boolean submitted;
 	
 	private static EventManager eventManager;
 	private HandTrackerInterface driver;
@@ -78,6 +81,8 @@ public class Module extends ProcessingModule {
 		end = new VirtualRectClick(1000, width / 10, 5 * height/ 7, width / 5, height /5);
 		playAgain = new VirtualRectClick(1000, 2 * width / 5, 5 * height / 7, width / 5, height / 5);
         submitScore = new VirtualRectClick(1000, 7 * width / 10, 5 * height / 7, width / 5, height / 5);
+		end_s = new VirtualRectClick(1000, width / 5, 5 * height/ 7, width / 5, height /5);
+		playAgain_s = new VirtualRectClick(1000, 3 * width / 5, 5 * height / 7, width / 5, height / 5);
 		noCursor();
 		cursor_image = loadImage(CURSOR_FILENAME);
 		cursor_image.resize(32, 32);
@@ -85,6 +90,7 @@ public class Module extends ProcessingModule {
 		saver = new ScoreSaver("BrickBreaker");
 		registerTracking();
         gameOver = false;
+		submitted = false;
 		gamePaused = true;
 	}
 	
@@ -118,7 +124,7 @@ public class Module extends ProcessingModule {
                 projectile = spawnProjectile();
                 bricksList = populateBricks();
             }
-        } else {
+        } else if(!submitted) {
 			end.update((int) handX, (int) handY, millis());
 			playAgain.update((int) handX, (int) handY, millis());
             submitScore.update((int) handX, (int) handY, millis());
@@ -141,10 +147,27 @@ public class Module extends ProcessingModule {
 					@Override
 					public void actionPerformed(ActionEvent e) {
 						receiver.release();
+						submitted = true;
 					}
 				}, points, receiver.whichHand(), driver);
 				receiver.setHand(-1);
             }
+		} else {
+			end_s.update((int) handX, (int) handY, millis());
+			playAgain_s.update((int) handX, (int) handY, millis());
+			if(end_s.durationCompleted(millis())) {
+				destroy();
+				driver.clearAllHands();
+			} else if(playAgain_s.durationCompleted(millis())) {
+				noCursor();
+				lives = START_LIVES;
+				bricksList = populateBricks();
+				projectile = spawnProjectile();
+				paddle.setX(PADDLE_START_X);
+				points = 0;
+				gameOver = false;
+				submitted = false;
+			}
 		}
 	}
 	
@@ -269,6 +292,10 @@ public class Module extends ProcessingModule {
 	}
 	
 	public void drawGameOver() {
+		if(submitted) {
+			drawGameOverSubmitted();
+			return;
+		}
 		fill(projectile.getColor());
 		rect(0, 0, width, height);
 		fill(255, 69, 0);
@@ -316,6 +343,46 @@ public class Module extends ProcessingModule {
 		noStroke();
 		image(cursor_image, handX, handY);
 
+	}
+
+	private void drawGameOverSubmitted() {
+		fill(projectile.getColor());
+		rect(0, 0, width, height);
+		fill(255, 69, 0);
+		textSize(min(width / 8, height / 6));
+		//rectMode(CENTER);
+		textAlign(CENTER, CENTER);
+		text("YOUR SCORE", width / 2, height / 6);
+		textSize(min(width / 12, height / 9));
+		text("" + saver.getLastSubmission(), width / 2, height / 3);
+		//textAlign(LEFT, TOP);
+		textSize(min(width / 16, height / 12));
+		text("HIGH SCORE:", width / 2, height / 2);
+		text(saver.getBestScoreString(ScoreSaver.ScorePattern.HIGH_BEST), width / 2, 3 * height / 5);
+
+		stroke(0);
+		strokeWeight(4);
+
+		fill(255, 0, 0);
+		rect(end_s.getX(), end_s.getY(), end_s.getWidth(), end_s.getHeight(), end_s.getWidth() / 6);
+
+		//draw text for end game box
+		textAlign(CENTER, CENTER);
+		textSize(end_s.getWidth()/10);
+		fill(0,0,0);
+		text(GAME_END_TEXT, end_s.getX(), end_s.getY(), end_s.getWidth(), end_s.getHeight());
+
+		fill(50, 205, 50);
+		rect(playAgain_s.getX(), playAgain_s.getY(), playAgain_s.getWidth(), playAgain_s.getHeight(), playAgain_s.getWidth() / 6);
+
+		//draw text for new game box
+		textAlign(CENTER, CENTER);
+		textSize(playAgain_s.getWidth()/10);
+		fill(0,0,0);
+		text(GAME_RESTART_TEXT, playAgain_s.getX(), playAgain_s.getY(), playAgain_s.getWidth(), playAgain_s.getHeight());
+
+		noStroke();
+		image(cursor_image, handX, handY);
 	}
 	
 	public void drawScore() {

@@ -2,7 +2,7 @@
 <manifest 
     package="edu.acmX.exhibit.brickbreaker"
     class="Module" 
-    icon="icon.png" 
+    icon="BBicon.png"
     title="Brick Breaker"
     author="Exhibit Team"
     version="0.0.1">

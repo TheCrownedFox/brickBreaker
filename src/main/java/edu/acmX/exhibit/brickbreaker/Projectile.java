@@ -6,7 +6,7 @@ import java.awt.geom.Rectangle2D;
 import processing.core.PApplet;
 	
 public class Projectile {
-	
+
 	private PApplet parent;
 	private float x;
 	private float y;
@@ -43,28 +43,28 @@ public class Projectile {
 	public void update() {
 		// check against left edge
 		if (x <= 0) {
-			velocityX *= -1;
+			velocityX = Math.abs(velocityX);
 		}
 		// check against the right edge
 		if (x + width >= parent.width) {
-			velocityX *= -1;
+			velocityX = -1 * Math.abs(velocityX);
 		}
 		// check against the top edge
 		if (y <= 0) {
-			velocityY *= -1;
+			velocityY = Math.abs(velocityY);
 		}
 		// check against the bottom edge
 		if (y + height >= parent.height) {
 			dead = true;
 		}
-		
+
 		// move
 		x += velocityX;
 		y += velocityY;
 		// update rect
 		rect.setRect(x, y, width, height);
 	}
-	
+
 	public void reverseXDirection() {
 		velocityX *= -1;
 	}

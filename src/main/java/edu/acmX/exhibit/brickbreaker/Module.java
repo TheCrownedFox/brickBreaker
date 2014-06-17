@@ -84,7 +84,7 @@ public class Module extends ProcessingModule {
 		end_s = new VirtualRectClick(1000, width / 5, 5 * height/ 7, width / 5, height /5);
 		playAgain_s = new VirtualRectClick(1000, 3 * width / 5, 5 * height / 7, width / 5, height / 5);
 		noCursor();
-		frameRate(30);
+		frameRate(45);
 		cursor_image = loadImage(CURSOR_FILENAME);
 		cursor_image.resize(32, 32);
 		points = 0;
